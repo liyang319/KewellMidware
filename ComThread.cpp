@@ -1,5 +1,10 @@
 #include "ComThread.h"
 
+ComThread::ComThread() : m_running(false)
+{
+    m_threadFunc = NULL;
+}
+
 ComThread::ComThread(void *(*threadFunc)(void *)) : m_running(false), m_threadFunc(threadFunc)
 {
 }
@@ -49,4 +54,9 @@ void *ComThread::threadFunc(void *arg)
         return thread->m_threadFunc(arg);
     }
     return NULL;
+}
+
+void ComThread::setCallbackFun(void *(*threadFunc)(void *))
+{
+    m_threadFunc = threadFunc;
 }

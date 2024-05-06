@@ -43,16 +43,3 @@ void NodeThread::run()
     std::cout << "Thread " << chl_index << " is running with IP: " << chl_ip << " and port: " << chl_port << std::endl;
     printf("\n");
 }
-
-// int main()
-// {
-//     NodeThread thread;
-//     thread.start();
-
-//     // 等待一段时间
-//     sleep(2);
-
-//     thread.stop();
-
-//     return 0;
-// }

@@ -6,6 +6,12 @@
 #include <cstring>
 #include "ComThread.h"
 
+UpperTcpClient &UpperTcpClient::getInstance(const std::string &server_ip, int server_port)
+{
+    static UpperTcpClient instance(server_ip, server_port);
+    return instance;
+}
+
 UpperTcpClient::UpperTcpClient(const std::string &server_ip, int server_port)
     : server_ip_(server_ip), server_port_(server_port), socket_fd_(-1), is_running_(true)
 {
