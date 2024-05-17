@@ -39,8 +39,10 @@ private:
     int data_socket;
     int ctrl_socket;
     std::atomic<bool> is_running;
-    std::queue<std::string> data_queue;
-    std::queue<std::string> ctrl_queue;
+    std::queue<std::string> data_recv_queue;
+    std::queue<std::string> data_send_queue;
+    std::queue<std::string> ctrl_recv_queue;
+    std::queue<std::string> ctrl_send_queue;
     std::mutex data_mutex;
     std::mutex ctrl_mutex;
 
@@ -77,17 +79,22 @@ private:
     void handleDataConnection(int client_socket)
     {
         int index = 0;
+        printf("----handleDataConnection push---\n");
+        data_send_queue.push("111");
+        data_send_queue.push("222222");
+        data_send_queue.push("333333333");
         while (true)
         {
             sleep(1);
+            /////////////////////////////数据接收//////////////////////////////////
             printf("-----index=%d------\n", index);
             char buffer[1024];
             int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
             if (bytes_received > 0)
             {
                 std::lock_guard<std::mutex> lock(data_mutex);
-                data_queue.push(std::string(buffer, bytes_received));
-                printf("------handleDataConnection----size-%lu-\n", data_queue.size());
+                data_recv_queue.push(std::string(buffer, bytes_received));
+                printf("------handleDataConnection----size-%lu-\n", data_recv_queue.size());
             }
             else if (bytes_received == 0)
             {
@@ -108,22 +115,40 @@ private:
                     close(client_socket);
                     break;
                 }
+            }
+            /////////////////////////////数据发送//////////////////////////////////
+            std::lock_guard<std::mutex> lock(data_mutex);
+            if (!data_send_queue.empty())
+            {
+                std::string data_to_send = data_send_queue.front();
+                data_send_queue.pop();
+                int bytes_sent = send(client_socket, data_to_send.c_str(), data_to_send.length(), 0);
+                if (bytes_sent == -1)
+                {
+                    std::cerr << "Error sending data: " << strerror(errno) << std::endl;
+                }
+                printf("------data_send_queue---send-%d--\n", bytes_sent);
             }
         }
     }
 
     void handleCtrlConnection(int client_socket)
     {
+        printf("----handleDataConnection push---\n");
+        ctrl_send_queue.push("111");
+        ctrl_send_queue.push("222222");
+        ctrl_send_queue.push("333333333");
         while (true)
         {
             sleep(1);
+            /////////////////////////////数据接收//////////////////////////////////
             char buffer[1024];
             int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
             if (bytes_received > 0)
             {
                 std::lock_guard<std::mutex> lock(ctrl_mutex);
-                ctrl_queue.push(std::string(buffer, bytes_received));
-                printf("------handleCtrlConnection----size-%lu-\n", ctrl_queue.size());
+                ctrl_recv_queue.push(std::string(buffer, bytes_received));
+                printf("------handleCtrlConnection----size-%lu-\n", ctrl_recv_queue.size());
             }
             else if (bytes_received == 0)
             {
@@ -144,6 +169,19 @@ private:
                     close(client_socket);
                     break;
                 }
+            }
+            /////////////////////////////数据发送//////////////////////////////////
+            std::lock_guard<std::mutex> lock(ctrl_mutex);
+            if (!ctrl_send_queue.empty())
+            {
+                std::string ctrl_to_send = ctrl_send_queue.front();
+                ctrl_send_queue.pop();
+                int bytes_sent = send(client_socket, ctrl_to_send.c_str(), ctrl_to_send.length(), 0);
+                if (bytes_sent == -1)
+                {
+                    std::cerr << "Error sending data: " << strerror(errno) << std::endl;
+                }
+                printf("------ctrl_send_queue---send-%d--\n", bytes_sent);
             }
         }
     }
