@@ -80,30 +80,22 @@ private:
     void handleDataConnection(int client_socket)
     {
         int index = 0;
-        // printf("----handleDataConnection push---\n");
-        // data_send_queue.push("111");
-        // data_send_queue.push("222222");
-        // data_send_queue.push("333333333");
+        printf("----handleDataConnection push---\n");
+        data_send_queue.push("111");
+        data_send_queue.push("222222");
+        data_send_queue.push("333333333");
         while (true)
         {
             sleep(1);
             /////////////////////////////数据接收//////////////////////////////////
-            // printf("-----index=%d------\n", index);
+            printf("-----index=%d------\n", index);
             char buffer[1024];
             int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
             if (bytes_received > 0)
             {
                 std::lock_guard<std::mutex> lock(data_mutex);
-                std::array<char, 1024> recvData;
-                std::copy(buffer, buffer + strlen(buffer), recvData.begin());
-                AppData::getInstance().addDataToDataRecvQueue(recvData);
-                // data_recv_queue.push(std::string(buffer, bytes_received));
-                // printf("------handleDataConnection----size-%lu-\n", data_recv_queue.size());
-
-                std::array<char, 1024> bakData = AppData::getInstance().getDataFromDataRecvQueue();
-                std::string str(bakData.data());
-                printf("----------%s----------------------\n", str.c_str());
-                printf("------handleDataConnection----bak-%lu-\n", str.length());
+                data_recv_queue.push(std::string(buffer, bytes_received));
+                printf("------handleDataConnection----size-%lu-\n", data_recv_queue.size());
             }
             else if (bytes_received == 0)
             {
@@ -143,7 +135,7 @@ private:
 
     void handleCtrlConnection(int client_socket)
     {
-        printf("----handleCtrlConnection push---\n");
+        printf("----handleDataConnection push---\n");
         ctrl_send_queue.push("111");
         ctrl_send_queue.push("222222");
         ctrl_send_queue.push("333333333");
