@@ -80,7 +80,7 @@ private:
     void handleDataConnection(int client_socket)
     {
         int index = 0;
-        // printf("----handleDataConnection push---\n");
+        printf("----handleDataConnection push---\n");
         // data_send_queue.push("111");
         // data_send_queue.push("222222");
         // data_send_queue.push("333333333");
@@ -93,17 +93,17 @@ private:
             int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
             if (bytes_received > 0)
             {
-                std::lock_guard<std::mutex> lock(data_mutex);
+                // std::lock_guard<std::mutex> lock(data_mutex);
                 std::array<char, 1024> recvData;
                 std::copy(buffer, buffer + strlen(buffer), recvData.begin());
                 AppData::getInstance().addDataToDataRecvQueue(recvData);
                 // data_recv_queue.push(std::string(buffer, bytes_received));
                 // printf("------handleDataConnection----size-%lu-\n", data_recv_queue.size());
-
-                std::array<char, 1024> bakData = AppData::getInstance().getDataFromDataRecvQueue();
-                std::string str(bakData.data());
-                printf("----------%s----------------------\n", str.c_str());
-                printf("------handleDataConnection----bak-%lu-\n", str.length());
+                printf("------handleDataConnection------size--%d-\n", AppData::getInstance().getDataRecvQueueSize());
+                // std::array<char, 1024> bakData = AppData::getInstance().getDataFromDataRecvQueue();
+                // std::string str(bakData.data());
+                // printf("--------------%s----------------------\n", str.c_str());
+                // printf("------handleDataConnection--------%lu-\n", str.length());
             }
             else if (bytes_received == 0)
             {
@@ -144,9 +144,9 @@ private:
     void handleCtrlConnection(int client_socket)
     {
         printf("----handleCtrlConnection push---\n");
-        ctrl_send_queue.push("111");
-        ctrl_send_queue.push("222222");
-        ctrl_send_queue.push("333333333");
+        // ctrl_send_queue.push("111");
+        // ctrl_send_queue.push("222222");
+        // ctrl_send_queue.push("333333333");
         while (true)
         {
             sleep(1);
@@ -155,9 +155,12 @@ private:
             int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
             if (bytes_received > 0)
             {
-                std::lock_guard<std::mutex> lock(ctrl_mutex);
-                ctrl_recv_queue.push(std::string(buffer, bytes_received));
-                // printf("------handleCtrlConnection----size-%lu-\n", ctrl_recv_queue.size());
+                // std::lock_guard<std::mutex> lock(ctrl_mutex);
+                std::array<char, 1024> recvData;
+                std::copy(buffer, buffer + strlen(buffer), recvData.begin());
+                AppData::getInstance().addDataToCtrlRecvQueue(recvData);
+                // ctrl_recv_queue.push(std::string(buffer, bytes_received));
+                printf("------handleCtrlConnection----size-%d-\n", AppData::getInstance().getCtrlRecvQueueSize());
             }
             else if (bytes_received == 0)
             {

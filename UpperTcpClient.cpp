@@ -23,6 +23,10 @@ UpperTcpClient::~UpperTcpClient()
     {
         close(socket_fd_);
     }
+    if (pSend_thread)
+        delete pSend_thread;
+    if (pRecv_thread)
+        delete pRecv_thread;
 }
 
 void UpperTcpClient::Init()
