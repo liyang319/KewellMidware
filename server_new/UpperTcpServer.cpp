@@ -59,20 +59,20 @@ void UpperTcpServer::handleDataConnection(int client_socket)
     {
         sleep(1);
         /////////////////////////////数据接收//////////////////////////////////
-        char buffer[1024];
+        char buffer[DEFAULT_DATA_ITEM_SIZE];
         int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
         if (bytes_received > 0)
         {
             // std::lock_guard<std::mutex> lock(data_mutex);
-            std::array<char, 1024> recvData;
+            std::array<char, DEFAULT_DATA_ITEM_SIZE> recvData;
             std::copy(buffer, buffer + strlen(buffer), recvData.begin());
             AppData::getInstance().addDataToDataRecvQueue(recvData);
             printf("------handleDataConnection------size--%d-\n", AppData::getInstance().getDataRecvQueueSize());
 
-            std::array<char, 1024> recv_data = AppData::getInstance().getDataFromDataRecvQueue();
-            std::string str(recv_data.data());
+            // std::array<char, 1024> recv_data = AppData::getInstance().getDataFromDataRecvQueue();
+            // std::string str(recv_data.data());
             // cout << "------add data send queue--------" << str << endl;
-            AppData::getInstance().addDataToDataSendQueue(recv_data);
+            // AppData::getInstance().addDataToDataSendQueue(recv_data);
         }
         else if (bytes_received == 0)
         {
@@ -98,7 +98,7 @@ void UpperTcpServer::handleDataConnection(int client_socket)
         // std::lock_guard<std::mutex> lock(data_mutex);
         if (AppData::getInstance().getDataSendQueueSize() > 0)
         {
-            std::array<char, 1024> send_data = AppData::getInstance().getDataFromDataSendQueue();
+            std::array<char, DEFAULT_DATA_ITEM_SIZE> send_data = AppData::getInstance().getDataFromDataSendQueue();
             printf("-----data_send_queue----datasize=%zu--\n", send_data.size());
             int bytes_sent = send(client_socket, send_data.data(), send_data.size(), 0);
             if (bytes_sent == -1)
@@ -118,18 +118,18 @@ void UpperTcpServer::handleCtrlConnection(int client_socket)
     {
         sleep(1);
         /////////////////////////////数据接收//////////////////////////////////
-        char buffer[1024];
+        char buffer[DEFAULT_DATA_ITEM_SIZE];
         int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
         if (bytes_received > 0)
         {
             // std::lock_guard<std::mutex> lock(ctrl_mutex);
-            std::array<char, 1024> recvData;
+            std::array<char, DEFAULT_DATA_ITEM_SIZE> recvData;
             std::copy(buffer, buffer + strlen(buffer), recvData.begin());
             AppData::getInstance().addDataToCtrlRecvQueue(recvData);
             printf("------handleCtrlConnection----size-%d-\n", AppData::getInstance().getCtrlRecvQueueSize());
 
-            std::array<char, 1024> recv_data = AppData::getInstance().getDataFromCtrlRecvQueue();
-            AppData::getInstance().addDataToCtrlSendQueue(recv_data);
+            // std::array<char, 1024> recv_data = AppData::getInstance().getDataFromCtrlRecvQueue();
+            // AppData::getInstance().addDataToCtrlSendQueue(recv_data);
         }
         else if (bytes_received == 0)
         {
@@ -155,7 +155,7 @@ void UpperTcpServer::handleCtrlConnection(int client_socket)
         // std::lock_guard<std::mutex> lock(ctrl_mutex);
         if (AppData::getInstance().getCtrlSendQueueSize() > 0)
         {
-            std::array<char, 1024> send_data = AppData::getInstance().getDataFromCtrlSendQueue();
+            std::array<char, DEFAULT_DATA_ITEM_SIZE> send_data = AppData::getInstance().getDataFromCtrlSendQueue();
             printf("-----ctrl_send_queue----datasize=%zu--\n", send_data.size());
             int bytes_sent = send(client_socket, send_data.data(), send_data.size(), 0);
             if (bytes_sent == -1)
@@ -220,5 +220,15 @@ void UpperTcpServer::run()
                 t.detach();
             }
         }
+    }
+}
+
+void UpperTcpServer::join()
+{
+    // Implementation for waiting for the server thread to finish
+    while (this->is_running)
+    {
+        // Wait for the server thread to finish
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }

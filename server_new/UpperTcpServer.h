@@ -20,6 +20,7 @@ public:
     UpperTcpServer(int data_port, int ctrl_port);
     void start();
     void stop();
+    void join();
 
 private:
     int data_port;
