@@ -18,7 +18,7 @@ int main()
 
     struct sockaddr_in server_addr;
     server_addr.sin_family = AF_INET;
-    server_addr.sin_port = htons(8002);                   // Change port number if needed
+    server_addr.sin_port = htons(8001);                   // Change port number if needed
     server_addr.sin_addr.s_addr = inet_addr("127.0.0.1"); // Change IP address if needed
 
     if (connect(sock, (struct sockaddr *)&server_addr, sizeof(server_addr)) == -1)

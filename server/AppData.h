@@ -6,6 +6,8 @@
 #include <array>
 #include <mutex>
 
+#define DEFAULT_DATA_ITEM_SIZE 1024
+
 class AppData
 {
 
@@ -14,10 +16,10 @@ private:
     AppData(const AppData &) = delete;            // delete the copy constructor
     AppData &operator=(const AppData &) = delete; // delete the assignment operator
 
-    std::queue<std::array<char, 1024>> data_recv_queue;
-    std::queue<std::array<char, 1024>> data_send_queue;
-    std::queue<std::array<char, 1024>> ctrl_recv_queue;
-    std::queue<std::array<char, 1024>> ctrl_send_queue;
+    std::queue<std::array<char, DEFAULT_DATA_ITEM_SIZE>> data_recv_queue;
+    std::queue<std::array<char, DEFAULT_DATA_ITEM_SIZE>> data_send_queue;
+    std::queue<std::array<char, DEFAULT_DATA_ITEM_SIZE>> ctrl_recv_queue;
+    std::queue<std::array<char, DEFAULT_DATA_ITEM_SIZE>> ctrl_send_queue;
 
     std::mutex data_recv_queue_mutex;
     std::mutex data_send_queue_mutex;

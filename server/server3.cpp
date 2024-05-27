@@ -10,7 +10,7 @@
 #include <mutex>
 #include "AppData.h"
 
-using namespace std;
+// using namespace std;
 class UpperTcpServer
 {
 public:
@@ -41,12 +41,6 @@ private:
     int data_socket;
     int ctrl_socket;
     std::atomic<bool> is_running;
-    std::queue<std::string> data_recv_queue;
-    std::queue<std::string> data_send_queue;
-    std::queue<std::string> ctrl_recv_queue;
-    std::queue<std::string> ctrl_send_queue;
-    std::mutex data_mutex;
-    std::mutex ctrl_mutex;
 
     int createSocket(int port)
     {
@@ -82,14 +76,10 @@ private:
     {
         int index = 0;
         printf("----handleDataConnection push---\n");
-        // data_send_queue.push("111");
-        // data_send_queue.push("222222");
-        // data_send_queue.push("333333333");
         while (true)
         {
             sleep(1);
             /////////////////////////////数据接收//////////////////////////////////
-            // printf("-----index=%d------\n", index);
             char buffer[1024];
             int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
             if (bytes_received > 0)
@@ -98,17 +88,12 @@ private:
                 std::array<char, 1024> recvData;
                 std::copy(buffer, buffer + strlen(buffer), recvData.begin());
                 AppData::getInstance().addDataToDataRecvQueue(recvData);
-                // data_recv_queue.push(std::string(buffer, bytes_received));
-                // printf("------handleDataConnection----size-%lu-\n", data_recv_queue.size());
                 printf("------handleDataConnection------size--%d-\n", AppData::getInstance().getDataRecvQueueSize());
 
                 std::array<char, 1024> recv_data = AppData::getInstance().getDataFromDataRecvQueue();
                 std::string str(recv_data.data());
                 // cout << "------add data send queue--------" << str << endl;
                 AppData::getInstance().addDataToDataSendQueue(recv_data);
-                // std::string str(bakData.data());
-                // printf("--------------%s----------------------\n", str.c_str());
-                // printf("------handleDataConnection--------%lu-\n", str.length());
             }
             else if (bytes_received == 0)
             {
@@ -131,15 +116,12 @@ private:
                 }
             }
             /////////////////////////////数据发送//////////////////////////////////
-            std::lock_guard<std::mutex> lock(data_mutex);
+            // std::lock_guard<std::mutex> lock(data_mutex);
             if (AppData::getInstance().getDataSendQueueSize() > 0)
             {
-                // std::string data_to_send = data_send_queue.front();
-                // data_send_queue.pop();
                 std::array<char, 1024> send_data = AppData::getInstance().getDataFromDataSendQueue();
                 printf("-----data_send_queue----datasize=%zu--\n", send_data.size());
                 int bytes_sent = send(client_socket, send_data.data(), send_data.size(), 0);
-                // int bytes_sent = send(client_socket, data_to_send.c_str(), data_to_send.length(), 0);
                 if (bytes_sent == -1)
                 {
                     std::cerr << "Error sending data: " << strerror(errno) << std::endl;
@@ -151,10 +133,7 @@ private:
 
     void handleCtrlConnection(int client_socket)
     {
-        printf("----handleCtrlConnection push---\n");
-        // ctrl_send_queue.push("111");
-        // ctrl_send_queue.push("222222");
-        // ctrl_send_queue.push("333333333");
+        printf("----handleCtrlConnection---\n");
         while (true)
         {
             sleep(1);
@@ -167,7 +146,6 @@ private:
                 std::array<char, 1024> recvData;
                 std::copy(buffer, buffer + strlen(buffer), recvData.begin());
                 AppData::getInstance().addDataToCtrlRecvQueue(recvData);
-                // ctrl_recv_queue.push(std::string(buffer, bytes_received));
                 printf("------handleCtrlConnection----size-%d-\n", AppData::getInstance().getCtrlRecvQueueSize());
 
                 std::array<char, 1024> recv_data = AppData::getInstance().getDataFromCtrlRecvQueue();
@@ -194,11 +172,9 @@ private:
                 }
             }
             /////////////////////////////数据发送//////////////////////////////////
-            std::lock_guard<std::mutex> lock(ctrl_mutex);
+            // std::lock_guard<std::mutex> lock(ctrl_mutex);
             if (AppData::getInstance().getCtrlSendQueueSize() > 0)
             {
-                // std::string ctrl_to_send = ctrl_send_queue.front();
-                // ctrl_send_queue.pop();
                 std::array<char, 1024> send_data = AppData::getInstance().getDataFromCtrlSendQueue();
                 printf("-----ctrl_send_queue----datasize=%zu--\n", send_data.size());
                 int bytes_sent = send(client_socket, send_data.data(), send_data.size(), 0);
