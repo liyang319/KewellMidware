@@ -14,7 +14,7 @@
 
 int main()
 {
-    UpperTcpServer server(8001, 8002);
+    UpperTcpServer server(1031, 1030);
     UpperWorkerThread workerThread;
     // workerThread.start();
     server.start();

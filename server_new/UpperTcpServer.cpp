@@ -67,16 +67,10 @@ void UpperTcpServer::handleDataConnection(int client_socket)
             std::array<char, DEFAULT_DATA_ITEM_SIZE> recvData;
             std::copy(buffer, buffer + strlen(buffer), recvData.begin());
             AppData::getInstance().addDataToDataRecvQueue(recvData);
-            printf("------handleDataConnection------size--%d-\n", AppData::getInstance().getDataRecvQueueSize());
-
-            // std::array<char, 1024> recv_data = AppData::getInstance().getDataFromDataRecvQueue();
-            // std::string str(recv_data.data());
-            // cout << "------add data send queue--------" << str << endl;
-            // AppData::getInstance().addDataToDataSendQueue(recv_data);
         }
         else if (bytes_received == 0)
         {
-            std::cerr << "Client disconnected" << std::endl;
+            std::cerr << "DATA port disconnected" << std::endl;
             close(client_socket);
             break;
         }
@@ -117,23 +111,24 @@ void UpperTcpServer::handleCtrlConnection(int client_socket)
     while (true)
     {
         sleep(1);
+        printf("----check---\n");
         /////////////////////////////数据接收//////////////////////////////////
-        char buffer[DEFAULT_DATA_ITEM_SIZE];
+        char buffer[DEFAULT_DATA_ITEM_SIZE] = {0};
         int bytes_received = recv(client_socket, buffer, sizeof(buffer), 0);
         if (bytes_received > 0)
         {
             // std::lock_guard<std::mutex> lock(ctrl_mutex);
-            std::array<char, DEFAULT_DATA_ITEM_SIZE> recvData;
+            std::array<char, DEFAULT_DATA_ITEM_SIZE> recvData{};
             std::copy(buffer, buffer + strlen(buffer), recvData.begin());
             AppData::getInstance().addDataToCtrlRecvQueue(recvData);
-            printf("------handleCtrlConnection----size-%d-\n", AppData::getInstance().getCtrlRecvQueueSize());
+            // printf("------handleCtrlConnection----size-%d-\n", AppData::getInstance().getCtrlRecvQueueSize());
 
             // std::array<char, 1024> recv_data = AppData::getInstance().getDataFromCtrlRecvQueue();
             // AppData::getInstance().addDataToCtrlSendQueue(recv_data);
         }
         else if (bytes_received == 0)
         {
-            std::cerr << "Client disconnected" << std::endl;
+            std::cerr << "CONTROL port disconnected" << std::endl;
             close(client_socket);
             break;
         }

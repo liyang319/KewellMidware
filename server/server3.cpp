@@ -245,12 +245,20 @@ private:
 
 int main()
 {
-    UpperTcpServer server(8001, 8002);
-    server.start();
+    // UpperTcpServer server(8001, 8002);
+    // server.start();
 
-    // Stop the server after 10 seconds
-    sleep(1000);
-    server.stop();
+    // // Stop the server after 10 seconds
+    // sleep(1000);
+    // server.stop();
+    int index = 0;
+    while (true)
+    {
+        std::cout << "---------------ControlBox------1.1.1-----------" << index++ << std::endl;
+        // std::this_thread::sleep_for(std::chrono::hours(1));
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+    return 0;
 
     return 0;
 }

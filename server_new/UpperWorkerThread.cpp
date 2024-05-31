@@ -50,17 +50,17 @@ void UpperWorkerThread::threadFunction()
         if (AppData::getInstance().getCtrlRecvQueueSize() > 0)
         {
             cout << "----Worker---getCtrlRecvQueueSize------" << AppData::getInstance().getCtrlRecvQueueSize() << endl;
-            std::array<char, 1024> recv_data = AppData::getInstance().getDataFromDataRecvQueue();
+            std::array<char, 1024> recv_data = AppData::getInstance().getDataFromCtrlRecvQueue();
             std::string str(recv_data.data());
             cout << "--------" << str << endl;
         }
 
         if (AppData::getInstance().getDataRecvQueueSize() > 0)
         {
-            cout << "----workerm---getDataRecvQueueSize------" << AppData::getInstance().getDataRecvQueueSize() << endl;
+            // cout << "----worker---getDataRecvQueueSize------" << AppData::getInstance().getDataRecvQueueSize() << endl;
             std::array<char, 1024> recv_data = AppData::getInstance().getDataFromDataRecvQueue();
             std::string str(recv_data.data());
-            cout << "--------" << str << endl;
+            // cout << "--------" << str << endl;
         }
         // usleep(10000);
         sleep(1);

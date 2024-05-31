@@ -3,7 +3,7 @@ CFLAGS=-c -Wall -std=c++11
 LDFLAGS= -lpthread
 SOURCES=server3.cpp AppData.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=MyTest
+EXECUTABLE=ControlBox
 
 all: $(SOURCES) $(EXECUTABLE)
 
